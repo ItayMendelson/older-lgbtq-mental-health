@@ -484,7 +484,7 @@ ggplot(plot_data, aes(x = factor(treatment), y = outcome_value, fill = factor(tr
   )
 ```
 
-![](figures/partner-indices-1.jpg)<!-- -->
+![](figures/partner_wellbeing.jpg)<!-- -->
 
 <figure>
 <img src="figures/partner_results.jpg" alt="Partnership Results" />
@@ -532,7 +532,7 @@ ggplot(matched_df, aes(x = cesd, color = edu2, fill = edu2)) +
 )
 ```
 
-![](figures/edu2-cesd-1.jpg)<!-- -->
+![](figures/cesd_edu.jpg)<!-- -->
 
 ### Outness and Anxiety Among Older LGBTQ+ Adults
 
@@ -556,7 +556,7 @@ ggplot(df, aes(x = factor(out2), y = gai, fill = factor(out2))) +
         )
 ```
 
-<img src="figures/outness-gai-1.jpg" width="\linewidth" style="display: block; margin: auto auto auto 0;" />
+<img src="figures/outness_gai.jpg" width="\linewidth" style="display: block; margin: auto auto auto 0;" />
 
 ### Loneliness Across Self-Perceived Health Levels
 
@@ -586,4 +586,4 @@ ggplot(summary_df, aes(x = factor(sph), y = mean_lon)) +
   theme_minimal(base_size = 13)
 ```
 
-![](figures/sph2-lon-1.jpg)<!-- -->
+![](figures/sph_loneliness.jpg)<!-- -->
