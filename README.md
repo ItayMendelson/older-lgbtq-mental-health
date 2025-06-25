@@ -584,8 +584,6 @@ ggplot(summary_df, aes(x = factor(sph), y = mean_lon)) +
   theme_minimal(base_size = 13)
 ```
 
-![](figures/sph_loneliness_plot.jpg)<!-- -->
-
 <figure>
 <img src="figures/sph_loneliness_plot.jpg" alt="Partnership Results" />
 </figure>
