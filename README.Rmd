@@ -1,29 +1,15 @@
-Mental Health and Well-Being of Older LGBTQ+ Adults in Israel
-================
-Team number 10
-
-- [Environment Setup](#environment-setup)
-  - [Load Libraries](#load-libraries)
-  - [Read Table](#read-table)
-    - [Read survey results table](#read-survey-results-table)
-    - [Data Preprocessing](#data-preprocessing)
-- [Data Analyzing](#data-analyzing)
-  - [Linear Regression Model](#linear-regression-model)
-  - [Matching](#matching)
-  - [Plots](#plots)
-    - [Partnership and Mental Health](#partnership-and-mental-health)
-    - [Educational Attainment and Depression
-      Risk](#educational-attainment-and-depression-risk)
-    - [Outness and Anxiety Among Older LGBTQ+
-      Adults](#outness-and-anxiety-among-older-lgbtq-adults)
-    - [Loneliness Across Self-Perceived Health
-      Levels](#loneliness-across-self-perceived-health-levels)
-
+---
+title: "Mental Health and Well-Being of Older LGBTQ+ Adults in Israel"
+author: "Team number 10"
+output:
+  github_document:
+    toc: true
+fig_caption: true
+---
 # Environment Setup
 
 ## Load Libraries
-
-``` r
+```{r load-packages, warning=FALSE, message=FALSE}
 library(knitr)
 library(tidyverse)
 library(broom)
@@ -40,37 +26,33 @@ library(effsize)  # For Cohen's d measure
 
 ## Read Table
 
-The dataset used in this project contains sensitive information from a
-survey of older LGBTQ+ adults in Israel and is **not publicly
-available** due to ethical and privacy constraints. It was provided by
-Dr. Ella Cohn-Schwartz at Ben-Gurion University. If you wish to access
-the dataset for academic purposes, you may contact the data owner
-directly. To reproduce this analysis with your own data, please follow
-the structure and format described in the `code/` directory and place
-your data in a folder named `data/` as explained below.
+The dataset used in this project contains sensitive information from a survey of older LGBTQ+ adults in Israel and is **not publicly available** due to ethical and privacy constraints. It was provided by Dr. Ella Cohn-Schwartz at Ben-Gurion University.
+If you wish to access the dataset for academic purposes, you may contact the data owner directly.
+To reproduce this analysis with your own data, please follow the structure and format described in the `code/` directory and place your data in a folder named `data/` as explained below.
+
 
 > **Note**  
-> You should place the data in the root directory of the project under a
-> folder named data. Ensure the file name matches exactly, or update the
-> path in the scripts accordingly.
+> You should place the data in the root directory of the project under a folder named data. Ensure the file name matches exactly, or update the path in the scripts accordingly.
 
-    project/
-    ├── data/
-    │   └── data_toshare.csv
-    ├── figures/
-    ├── final_project.Rmd
-    ├── README.md
-    └── .gitignore
+project/
+├── data/
+│   └── data_toshare.csv
+├── figures/
+├── final_project.Rmd
+├── README.md
+└── .gitignore
+
+
 
 ### Read survey results table
-
-``` r
+```{r setup-data, warning=FALSE, cache=TRUE}
 data <- read.csv("../data/data_toshare.csv")
 ```
 
+
 ### Data Preprocessing
 
-``` r
+```{r preprocessing, cache=TRUE}
 # Filter valid responses
 data <- data %>% filter(Progress == 100 & lang == 0 & !is.na(age) & age <=75 & !is.na(bio_qlt))
 
@@ -177,13 +159,16 @@ data$sph2 <- ifelse(data$sph >= median(data$sph, na.rm = TRUE), 1, 0)
 # Create binary indicator for Tel Aviv area (location codes 7 or 8)
 data <- data %>%
   mutate(tel_aviv_area = ifelse(loc %in% c(7, 8), 1, 0))
+
+
 ```
+
 
 # Data Analyzing
 
-## Linear Regression Model
 
-``` r
+## Linear Regression Model
+```{r regresseion-model, cache=TRUE}
 set.seed(789)
 
 # Split the data into training (80%) and testing (20%) sets, stratified by 'lifesat' to preserve distribution
@@ -215,31 +200,10 @@ results <- tidy(model_fit)
 summary(model_fit$fit$fit$fit)
 ```
 
-    ## 
-    ## Call:
-    ## stats::lm(formula = ..y ~ ., data = data)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -8.1655 -0.7007  0.1168  0.8687  3.5464 
-    ## 
-    ## Coefficients:
-    ##                Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)     7.15581    0.07515  95.224  < 2e-16 ***
-    ## qol             0.24658    0.12223   2.017  0.04442 *  
-    ## cesd           -1.00810    0.14050  -7.175 4.42e-12 ***
-    ## gai            -0.12412    0.09596  -1.293  0.19674    
-    ## lon            -0.20407    0.10361  -1.970  0.04967 *  
-    ## spa             0.22130    0.08059   2.746  0.00635 ** 
-    ## int_homophobia -0.06674    0.08041  -0.830  0.40712    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 1.412 on 346 degrees of freedom
-    ## Multiple R-squared:  0.5421, Adjusted R-squared:  0.5342 
-    ## F-statistic: 68.28 on 6 and 346 DF,  p-value: < 2.2e-16
 
-``` r
+
+```{r regression-results, cache=TRUE}
+
 # Predict on test set
 test_predictions <- predict(model_fit, new_data = gay_test) %>%
   bind_cols(gay_test %>% select(lifesat))
@@ -264,15 +228,17 @@ adj_r2 <- 1 - (1 - r2_value) * ((n - 1) / (n - p - 1))
 
 final_metrics <- metrics_results %>%
   bind_rows(tibble(.metric = "adj_rsq", .estimate = adj_r2))
+
 ```
 
-<figure>
-<img src="figures/model_results.jpg" alt="Regression Model Results" />
-</figure>
 
-## Matching
+![Regression Model Results](model_results.jpg)
 
-``` r
+
+## Matching 
+
+```{r matching-setup, message=FALSE, warning=FALSE, cache=TRUE}
+
 # Define treatment and outcome variables
 features <- c("partner", "out2", "discr_age2", "discr_lgbt2", "discr_sex2", "child2", "emp2", "chronic2", "edu2", "sph2", "tel_aviv_area")
 indexes <- c("gai", "lon", "cesd", "qol", "int_homophobia", "spa")
@@ -315,77 +281,12 @@ for (feature in features) {
 results_sorted <- results %>% arrange(desc(abs(Cohen_d)))
 
 print(results_sorted)
+
 ```
 
-    ##                       Treatment        Outcome Mean_Difference      Cohen_d
-    ## mean in group 110          out2 int_homophobia    -0.874149657  1.285076246
-    ## mean in group 156          sph2           cesd    -0.677908165  1.116859269
-    ## mean in group 157          sph2            qol     0.958571422 -0.964017136
-    ## mean in group 12        partner           cesd    -0.495762134  0.795522722
-    ## mean in group 11        partner            lon    -0.468102071  0.777654544
-    ## mean in group 16           out2            gai    -1.274725275  0.776651643
-    ## mean in group 154          sph2            gai    -1.171428571  0.707851708
-    ## mean in group 155          sph2            lon    -0.409523800  0.632869860
-    ## mean in group 13        partner            qol     0.630382784 -0.627909394
-    ## mean in group 17           out2            lon    -0.377289370  0.619133794
-    ## mean in group 150          edu2           cesd    -0.412090433  0.603530901
-    ## mean in group 130        child2            gai    -1.005649718  0.589666467
-    ## mean in group 18           out2           cesd    -0.370094192  0.569044918
-    ## mean in group 112    discr_age2            gai     0.922374429 -0.551056402
-    ## mean in group 148          edu2            gai    -0.954128440  0.548372044
-    ## mean in group 114    discr_age2           cesd     0.342677757 -0.532267437
-    ## mean in group 122   discr_lgbt2 int_homophobia     0.372969185 -0.525065600
-    ## mean in group 19           out2            qol     0.513186824 -0.489653231
-    ## mean in group 113    discr_age2            lon     0.300608823 -0.480416608
-    ## mean in group 159          sph2            spa     0.194285728 -0.474195671
-    ## mean in group 14        partner int_homophobia    -0.336409199  0.473127185
-    ## mean in group 158          sph2 int_homophobia    -0.358503390  0.469836068
-    ## mean in group 116    discr_age2 int_homophobia     0.328658411 -0.465532939
-    ## mean in group 118   discr_lgbt2            gai     0.776470588 -0.455110618
-    ## mean in group 149          edu2            lon    -0.290519873  0.446087641
-    ## mean in group 120   discr_lgbt2           cesd     0.300063025 -0.445520371
-    ## mean in group 131        child2            lon    -0.272128066  0.433426197
-    ## mean in group 134        child2 int_homophobia    -0.292978201  0.407649980
-    ## mean in group 1         partner            gai    -0.693779904  0.406501032
-    ## mean in group 125    discr_sex2            lon     0.247044912 -0.394662236
-    ## mean in group 115    discr_age2            qol    -0.399771703  0.391405340
-    ## mean in group 151          edu2            qol     0.432110097 -0.388390774
-    ## mean in group 124    discr_sex2            gai     0.631205674 -0.381123115
-    ## mean in group 132        child2           cesd    -0.249233254  0.374984764
-    ## mean in group 126    discr_sex2           cesd     0.233232015 -0.347191841
-    ## mean in group 119   discr_lgbt2            lon     0.212745093 -0.326064142
-    ## mean in group 128    discr_sex2 int_homophobia     0.227625805 -0.318619552
-    ## mean in group 136          emp2            gai    -0.495412844  0.284548056
-    ## mean in group 133        child2            qol     0.299717539 -0.280539158
-    ## mean in group 146      chronic2 int_homophobia    -0.178841990  0.251272964
-    ## mean in group 15        partner            spa     0.094577354 -0.229396151
-    ## mean in group 121   discr_lgbt2            qol    -0.240882382  0.226935410
-    ## mean in group 135        child2            spa    -0.090583808  0.215519856
-    ## mean in group 138          emp2           cesd    -0.134731326  0.199769034
-    ## mean in group 145      chronic2            qol    -0.209090889  0.198267381
-    ## mean in group 161 tel_aviv_area            lon    -0.118819780  0.185803317
-    ## mean in group 152          edu2 int_homophobia    -0.129314114  0.173315721
-    ## mean in group 127    discr_sex2            qol    -0.169858183  0.164846092
-    ## mean in group 165 tel_aviv_area            spa     0.061084525 -0.149239149
-    ## mean in group 164 tel_aviv_area int_homophobia    -0.097174754  0.133530830
-    ## mean in group 147      chronic2            spa    -0.053598491  0.130000100
-    ## mean in group 144      chronic2           cesd     0.085775163 -0.128640013
-    ## mean in group 139          emp2            qol     0.133486216 -0.121985458
-    ## mean in group 160 tel_aviv_area            gai     0.210526316 -0.121335022
-    ## mean in group 140          emp2 int_homophobia    -0.077107911  0.105892770
-    ## mean in group 137          emp2            lon    -0.061162087  0.094122889
-    ## mean in group 162 tel_aviv_area           cesd    -0.063004101  0.093412464
-    ## mean in group 117    discr_age2            spa     0.038508364 -0.093329323
-    ## mean in group 129    discr_sex2            spa    -0.029314424  0.069057151
-    ## mean in group 153          edu2            spa     0.028440368 -0.064562445
-    ## mean in group 142      chronic2            gai    -0.096590909  0.057196786
-    ## mean in group 163 tel_aviv_area            qol    -0.045454540  0.043303847
-    ## mean in group 141          emp2            spa     0.014067256 -0.032724694
-    ## mean in group 111          out2            spa     0.003663013 -0.008934240
-    ## mean in group 123   discr_lgbt2            spa     0.003529399 -0.008373276
-    ## mean in group 143      chronic2            lon     0.004734850 -0.007481923
 
-``` r
+```{r, matching-num-pairs, warning=FALSE, message=FALSE, cache=TRUE}
+
 # Compute matched pairs count for each analysis
 for (name in names(matched_data_list)) {
   df <- matched_data_list[[name]]
@@ -399,56 +300,16 @@ for (name in names(matched_data_list)) {
     }
   }
 }
+
 ```
 
-    ## partner_gai : 209 matched pairs
-    ## partner_lon : 209 matched pairs
-    ## partner_cesd : 209 matched pairs
-    ## partner_qol : 209 matched pairs
-    ## partner_int_homophobia : 209 matched pairs
-    ## partner_spa : 209 matched pairs
-    ## out2_gai : 91 matched pairs
-    ## out2_lon : 91 matched pairs
-    ## out2_cesd : 91 matched pairs
-    ## out2_qol : 91 matched pairs
-    ## out2_int_homophobia : 91 matched pairs
-    ## out2_spa : 91 matched pairs
-    ## child2_gai : 177 matched pairs
-    ## child2_lon : 177 matched pairs
-    ## child2_cesd : 177 matched pairs
-    ## child2_qol : 177 matched pairs
-    ## child2_int_homophobia : 177 matched pairs
-    ## child2_spa : 177 matched pairs
-    ## emp2_gai : 109 matched pairs
-    ## emp2_lon : 109 matched pairs
-    ## emp2_cesd : 109 matched pairs
-    ## emp2_qol : 109 matched pairs
-    ## emp2_int_homophobia : 109 matched pairs
-    ## emp2_spa : 109 matched pairs
-    ## chronic2_gai : 176 matched pairs
-    ## chronic2_lon : 176 matched pairs
-    ## chronic2_cesd : 176 matched pairs
-    ## chronic2_qol : 176 matched pairs
-    ## chronic2_int_homophobia : 176 matched pairs
-    ## chronic2_spa : 176 matched pairs
-    ## edu2_gai : 109 matched pairs
-    ## edu2_lon : 109 matched pairs
-    ## edu2_cesd : 109 matched pairs
-    ## edu2_qol : 109 matched pairs
-    ## edu2_int_homophobia : 109 matched pairs
-    ## edu2_spa : 109 matched pairs
-    ## sph2_gai : 70 matched pairs
-    ## sph2_lon : 70 matched pairs
-    ## sph2_cesd : 70 matched pairs
-    ## sph2_qol : 70 matched pairs
-    ## sph2_int_homophobia : 70 matched pairs
-    ## sph2_spa : 70 matched pairs
 
 ## Plots
 
-### Partnership and Mental Health
 
-``` r
+
+### Partnership and Mental Health
+```{r partner-indices, cache=TRUE}
 # Set treatment variable
 treatment_var <- "partner"
 
@@ -483,15 +344,13 @@ ggplot(plot_data, aes(x = factor(treatment), y = outcome_value, fill = factor(tr
   )
 ```
 
-![](figures/partner_wellbeing.jpg)<!-- -->
 
-<figure>
-<img src="figures/partner_results.jpg" alt="Partnership Results" />
-</figure>
+![Partnership Results](partner_results.jpg)
 
-### Educational Attainment and Depression Risk
 
-``` r
+###  Educational Attainment and Depression Risk
+```{r edu2-cesd, cache=TRUE}
+
 # Get matched data for education (edu2) and depression (cesd)
 matched_df <- matched_data_list[["edu2_cesd"]]
 
@@ -528,13 +387,11 @@ ggplot(matched_df, aes(x = cesd, color = edu2, fill = edu2)) +
   legend.title = element_text(size = 12),
   legend.text = element_text(size = 11)
 )
+
 ```
 
-![](figures/cesd_edu.jpg)<!-- -->
-
 ### Outness and Anxiety Among Older LGBTQ+ Adults
-
-``` r
+```{r outness-gai, out.width='\\linewidth', fig.align='left', fig.valign='t'}
 # Get matched data for outness (out2) and anxiety (gai)
 df <- matched_data_list[["out2_gai"]]
 
@@ -552,13 +409,12 @@ ggplot(df, aes(x = factor(out2), y = gai, fill = factor(out2))) +
   theme(legend.position = "none",
         plot.title = element_text(size = 14)
         )
-```
 
-<img src="figures/outness_gai.jpg" width="\linewidth" style="display: block; margin: auto auto auto 0;" />
+```
 
 ### Loneliness Across Self-Perceived Health Levels
 
-``` r
+```{r sph2-lon, cache=TRUE}
 matched_df <- matched_data_list[["sph2_lon"]]
 matched_df$sph <- data[rownames(matched_df), ][["sph"]]
 
@@ -583,8 +439,4 @@ ggplot(summary_df, aes(x = factor(sph), y = mean_lon)) +
   ) +
   theme_minimal(base_size = 13)
 ```
-
-<figure>
-<img src="figures/sph_loneliness_plot.jpg" alt="Partnership Results" />
-</figure>
 
