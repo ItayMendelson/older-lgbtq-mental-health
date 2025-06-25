@@ -268,7 +268,6 @@ final_metrics <- metrics_results %>%
 
 <figure>
 <img src="figures/model_results.jpg" alt="Regression Model Results" />
-<figcaption aria-hidden="true">Regression Model Results</figcaption>
 </figure>
 
 ## Matching
@@ -488,7 +487,6 @@ ggplot(plot_data, aes(x = factor(treatment), y = outcome_value, fill = factor(tr
 
 <figure>
 <img src="figures/partner_results.jpg" alt="Partnership Results" />
-<figcaption aria-hidden="true">Partnership Results</figcaption>
 </figure>
 
 ### Educational Attainment and Depression Risk
@@ -587,3 +585,4 @@ ggplot(summary_df, aes(x = factor(sph), y = mean_lon)) +
 ```
 
 ![](figures/sph_loneliness.jpg)<!-- -->
+<img src="figures/sph_loneliness.jpg" width="\linewidth" style="display: block; margin: auto auto auto 0;" />
