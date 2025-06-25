@@ -267,7 +267,7 @@ final_metrics <- metrics_results %>%
 ```
 
 <figure>
-<img src="model_results.jpg" alt="Regression Model Results" />
+<img src="figures/model_results.jpg" alt="Regression Model Results" />
 <figcaption aria-hidden="true">Regression Model Results</figcaption>
 </figure>
 
