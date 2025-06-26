@@ -42,8 +42,8 @@ library(effsize)  # For Cohen's d measure
 
 The dataset used in this project contains sensitive information from a
 survey of older LGBTQ+ adults in Israel and is **not publicly
-available** due to ethical and privacy constraints. It was provided by
-Dr. Ella Cohn-Schwartz at Ben-Gurion University. If you wish to access
+available** due to ethical and privacy constraints. The survey was conducted between January and August
+2023. It was provided by Dr. Ella Cohn-Schwartz at Ben-Gurion University. If you wish to access
 the dataset for academic purposes, you may contact the data owner
 directly. To reproduce this analysis with your own data, please follow
 the structure and format described in the `code/` directory and place
