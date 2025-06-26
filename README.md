@@ -65,7 +65,7 @@ your data in a folder named `data/` as explained below.
 ### Read survey results table
 
 ``` r
-data <- read.csv("../data/data_toshare.csv")
+data <- read.csv("data/data_toshare.csv")
 ```
 
 ### Data Preprocessing
