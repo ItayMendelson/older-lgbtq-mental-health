@@ -46,7 +46,7 @@ available** due to ethical and privacy constraints. The survey was conducted bet
 2023, and was provided by Dr. Ella Cohn-Schwartz at Ben-Gurion University. If you wish to access
 the dataset for academic purposes, you may contact the data owner
 directly. To reproduce this analysis with your own data, please follow
-the structure and format described in the `code/` directory and place
+the structure and format described in the here and place
 your data in a folder named `data/` as explained below.
 
 A full description of the dataset’s variables (over 150 features) is available in the [VARIABLES.md](VARIABLES.md) file.
