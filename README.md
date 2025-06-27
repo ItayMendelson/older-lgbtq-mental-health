@@ -49,6 +49,9 @@ directly. To reproduce this analysis with your own data, please follow
 the structure and format described in the `code/` directory and place
 your data in a folder named `data/` as explained below.
 
+A full description of the dataset’s variables (over 150 features) is available in the [VARIABLES.md](VARIABLES.md) file.
+
+
 > **Note**  
 > You should place the data in the root directory of the project under a
 > folder named data. Ensure the file name matches exactly, or update the
@@ -60,6 +63,7 @@ your data in a folder named `data/` as explained below.
     ├── figures/
     ├── final_project.Rmd
     ├── README.md
+    ├── VARIABLES.md
     └── .gitignore
 
 ### Read survey results table
